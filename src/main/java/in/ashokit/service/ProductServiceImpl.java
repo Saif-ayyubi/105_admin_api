@@ -1,15 +1,65 @@
 package in.ashokit.service;
 
 import in.ashokit.dto.ProductDto;
+import in.ashokit.entity.ProductCategoryEntity;
+import in.ashokit.entity.ProductEntity;
+import in.ashokit.mapper.ProductMapper;
+import in.ashokit.repo.ProductCategoryRepo;
+import in.ashokit.repo.ProductRepo;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 
 @Service
 public class ProductServiceImpl implements ProductService{
+
+    @Autowired
+    private ProductCategoryRepo categoryRepo;
+
+    @Autowired
+    private ProductRepo productRepo;
+
+    @Value("${images-upload-dir}")
+    private String imagesUploadDir;//path of image stored
+
     @Override
-    public ProductDto createProduct(Integer categoryId, ProductDto productDto) {
-        return null;
+    public ProductDto createProduct(Integer categoryId, ProductDto productDto, MultipartFile productImage) throws IOException {
+
+        String filename = productImage.getOriginalFilename();//getting exact name of file
+
+        Path filePath = Paths.get(imagesUploadDir + filename);//get the file path(i created in D drive)
+
+        // Create uploading dir if not available
+        if (!Files.exists(filePath.getParent())) {//if path not available then create it
+            try {
+                Files.createDirectories(filePath.getParent());//file path created here(directory created)
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        // copying file into target directory
+        Files.copy(productImage.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);//productImage.getInputStream() ==> getting file data(i.e. image that we got from UI) , copying file data to 'filePath', StandardCopyOption.REPLACE_EXISTING ==> if file already available then replace that
+
+        // setting file path to DTO object
+        productDto.setImageUrl(filePath.toString());
+
+        // save product obj
+        ProductCategoryEntity productCategoryEntity = categoryRepo.findById(categoryId).orElseThrow();//get ProductCategory object
+        ProductEntity productEntity = ProductMapper.convertToEntity(productDto);
+        productEntity.setCategory(productCategoryEntity);
+        productRepo.save(productEntity);//product obj saved
+
+        return ProductMapper.convertToDto(productEntity);
+
     }
 
     @Override
