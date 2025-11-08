@@ -17,9 +17,9 @@ public class ProductEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long productId;
+    private Integer productId;
     @Column(name = "name")
-    private String productName;
+    private String name;
     private String description;
     private String title;
     private BigDecimal unitPrice;

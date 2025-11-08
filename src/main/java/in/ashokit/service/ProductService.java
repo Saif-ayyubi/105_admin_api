@@ -10,7 +10,7 @@ public interface ProductService {
 
     public ProductDto createProduct(Integer categoryId, ProductDto productDto, MultipartFile productImage) throws IOException;//MultipartFile productImage ==> to store image coming from UI to DB
 
-    public ProductDto updateProduct(Integer productId, ProductDto productDto);
+    public ProductDto updateProduct(Integer productId, ProductDto productDto, MultipartFile productImage) throws IOException;
 
     public ProductDto deleteProduct(Integer productId);
 
