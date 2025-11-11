@@ -9,7 +9,7 @@ public interface ProductRepo extends JpaRepository<ProductEntity,Integer> {
 
     public List<ProductEntity> findByCategoryCategoryIdAndActive(Integer categoryId, boolean active);
 
-    public List<ProductEntity> findByProductNameContainingIgnoreCase(String productName);//select * from product where name like %name% ==> it will just check matching characters
+    public List<ProductEntity> findByNameContainingIgnoreCase(String productName);//select * from product where name like %name% ==> it will just check matching characters
 
     //public List<Product> findByName(String productName);//select * from product where name= ? ==> match the exact name
 
